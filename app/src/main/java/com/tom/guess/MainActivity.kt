@@ -1,5 +1,6 @@
 package com.tom.guess
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -16,6 +17,13 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        val count = getSharedPreferences("guess", MODE_PRIVATE)
+            .getInt("REC_COUNTER", -1)
+        val nick = getSharedPreferences("guess", MODE_PRIVATE)
+            .getString("REC_NICKNAME", null)
+        Log.d(TAG, "data: $count / $nick")
+
         viewModel = ViewModelProvider(this).get(GuessViewModel::class.java)
         viewModel.counter.observe(this, Observer { data ->
             counter.setText(data.toString())
@@ -29,7 +37,13 @@ class MainActivity : AppCompatActivity() {
             AlertDialog.Builder(this)
             .setTitle(getString(R.string.dialog_title))
             .setMessage(message)
-            .setPositiveButton(getString(R.string.ok), null)
+            .setPositiveButton(getString(R.string.ok), {dialog, which ->
+                if (result == GameResult.NUMBER_RIGHT) {
+                    val intent = Intent(this, RecordActivity::class.java)
+                    intent.putExtra("COUNTER", viewModel.count)
+                    startActivity(intent)
+                }
+            })
             .show()
         })
     }
