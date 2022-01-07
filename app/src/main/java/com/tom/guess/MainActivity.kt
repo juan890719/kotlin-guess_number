@@ -11,12 +11,14 @@ import androidx.lifecycle.ViewModelProvider
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
+    private val REQUEST_RECORD = 100
     private lateinit var viewModel: GuessViewModel
     val TAG = MainActivity::class.java.simpleName
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        Log.d(TAG, "onCreate: ")
 
         val count = getSharedPreferences("guess", MODE_PRIVATE)
             .getInt("REC_COUNTER", -1)
@@ -41,11 +43,56 @@ class MainActivity : AppCompatActivity() {
                 if (result == GameResult.NUMBER_RIGHT) {
                     val intent = Intent(this, RecordActivity::class.java)
                     intent.putExtra("COUNTER", viewModel.count)
-                    startActivity(intent)
+//                    startActivity(intent)
+                    startActivityForResult(intent, REQUEST_RECORD)
                 }
             })
             .show()
         })
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Log.d(TAG, "onStart: ")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d(TAG, "onStop: ")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d(TAG, "onPause: ")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "onResume: ")
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        Log.d(TAG, "onRestart: ")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d(TAG, "onDestroy: ")
+    }
+
+    fun test() {
+//        val intent = Intent(this, RecordActivity::class.java)
+//        intent.putExtra("A", "abc")
+//        intent.putExtra("BB", "Testing")
+//        startActivity(intent)
+        //
+        Intent(this, RecordActivity::class.java).apply {
+            putExtra("A", "abc")
+            putExtra("BB", "Testing")
+        }.also {
+            startActivity(it)
+        }
     }
 
     fun check(view: View) {
@@ -71,6 +118,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun playAgain(view: View) {
+        replay()
+    }
+
+    private fun replay() {
         AlertDialog.Builder(this)
             .setTitle("Replay game")
             .setMessage("Are you sure?")
@@ -80,5 +131,16 @@ class MainActivity : AppCompatActivity() {
             })
             .setNeutralButton("Cancel", null)
             .show()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_RECORD) {
+            if (resultCode == RESULT_OK) {
+                val nickname = data?.getStringExtra("NICK")
+                Log.d(TAG, "onActivityResult: ${nickname} ")
+                replay()
+            }
+        }
     }
 }

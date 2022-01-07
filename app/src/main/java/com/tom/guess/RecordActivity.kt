@@ -1,5 +1,6 @@
 package com.tom.guess
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -19,6 +20,10 @@ class RecordActivity : AppCompatActivity() {
                 .putInt("REC_COUNT", count)
                 .putString("REC_NICKNAME", nick)
                 .apply()
+            val intent = Intent()
+            intent.putExtra("NICK", nick)
+            setResult(RESULT_OK, intent)
+            finish()
         }
     }
 }
